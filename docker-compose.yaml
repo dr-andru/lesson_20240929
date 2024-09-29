@@ -1,0 +1,49 @@
+version: '3.0'
+
+services:
+  app:
+    container_name: lesson_new1_app
+    build:
+      context: .
+      dockerfile: .docker/app/Dockerfile
+    working_dir: /app
+    volumes:
+      - ./app:/app
+    env_file:
+      - './app/.env'
+
+  webserver:
+    container_name: lesson_new1_webserver
+    build:
+      context: .
+      dockerfile: .docker/webserver/Dockerfile
+    working_dir: /app
+    volumes:
+      - ./app:/app
+    ports:
+      - "8080:80" 
+
+  db:
+    container_name: lesson_new1_db
+    image: 'bitnami/postgresql:15.0.0'
+    volumes:
+      - 'db_data:/bitnami/postgresql'
+    environment:
+      POSTGRESQL_USERNAME: db_user
+      POSTGRESQL_PASSWORD: db_pass
+      POSTGRESQL_DATABASE: app
+
+  minio:
+    container_name: lesson_new1_minio
+    image: minio/minio
+    environment:
+      MINIO_ROOT_USER: user
+      MINIO_ROOT_PASSWORD: password
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: 'server /data --console-address ":9001"'
+
+volumes:
+  db_data:
+        
